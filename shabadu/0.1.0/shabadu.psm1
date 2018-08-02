@@ -1,0 +1,1 @@
+. "$PSScriptRoot\Add-DCHosts.ps1"
