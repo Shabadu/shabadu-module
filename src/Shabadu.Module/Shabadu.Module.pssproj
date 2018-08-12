@@ -7,6 +7,14 @@
     <RootNamespace>MyApplication</RootNamespace>
     <AssemblyName>MyApplication</AssemblyName>
     <Name>Shabadu.Module</Name>
+    <ManifestPath>$(OutDir)\shabadu.psd1</ManifestPath>
+    <Version>0.0.1.0</Version>
+    <Guid>1bb88745-9b60-4052-b5f0-8bde6ff8a10d</Guid>
+    <ProcessorArchitecture />
+    <Author>Adam Holt</Author>
+    <Copyright>Shabadu</Copyright>
+    <Description>Useful commands to help speed up development</Description>
+    <RequiredModules>'powershell-yaml','PsHosts'</RequiredModules>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -27,10 +35,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Add-DCHosts.ps1" />
+    <Compile Include="Compare-MediaItem.ps1" />
     <Compile Include="helpers.ps1" />
     <Compile Include="Install-DCCert.ps1" />
     <Compile Include="shabadu.psd1" />
     <Compile Include="shabadu.psm1" />
+    <Compile Include="Update-MediaItem.ps1" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Target Name="Build" />
