@@ -22,7 +22,7 @@ function Update-MediaItem {
 	$base64 = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($content))
 
 	$yaml = [System.IO.File]::ReadAllText($YamlFile)
-	$yamlObject = $yaml | ConvertFrom-Yaml
+	$yamlObject = $yaml | ConvertFrom-Yaml -Ordered
 	if($yamlObject.SharedFields)
 	{
 		$blob = $yamlObject.SharedFields | Where-Object Hint -eq 'Blob'
