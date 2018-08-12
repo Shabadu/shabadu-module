@@ -21,34 +21,37 @@ function Update-MediaItem {
 	$content = [System.IO.File]::ReadAllText($SourceFile)
 	$base64 = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($content))
 
-	$yaml = [System.IO.File]::ReadAllText($YamlFile)
-	$yamlObject = $yaml | ConvertFrom-Yaml -Ordered
-	if($yamlObject.SharedFields)
+	$found = $false;
+	$lines = [System.IO.File]::ReadAllLines($YamlFile)
+	for($i=0;$i -lt $lines.Length;$i++)
 	{
-		$blob = $yamlObject.SharedFields | Where-Object Hint -eq 'Blob'
-		if($blob -and $blob.Value)
+		$l = $lines[$i];
+		if($l -match "\sHint: Blob")
 		{
-			$blob.Value = $base64;
-			$size = $yamlObject.SharedFields | Where-Object Hint -eq 'Size'
-			if($size -and $size.Value)
+			if(($i + 2) -lt $lines.Length)
 			{
-				$size.Value = $content.Length
+				$v = $lines[$i + 2]
+				if($v -match "  Value:")
+				{
+					$found = $true;
+					$lines[$i + 2] = "  Value: {0}" -f $base64
+				}
 			}
-
-			$content = $yamlObject | ConvertTo-Yaml
-			$content = "---`r`n{0}" -f $content
-			[System.IO.File]::WriteAllText($YamlFile, $content)
-			return $true
 		}
-		else 
+		elseif($l -match "\sHint: Size")
 		{
-			return $false
+			if(($i + 1) -lt $lines.Length)
+			{
+				$v = $lines[$i + 1]
+				if($v -match "  Value:")
+				{
+					$lines[$i + 1] = "  Value: {0}" -f $base64.Length
+				}
+			}
 		}
 	}
-	else
-	{
-		Write-Error "Yaml does not have SharedFields"
-		return $false
-	}
-	
+
+	[System.IO.File]::WriteAllLines($YamlFile, $lines)
+
+	return $found
 }
