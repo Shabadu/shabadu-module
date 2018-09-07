@@ -55,3 +55,42 @@ function Elevate {
 	}
 	
 }
+
+<#
+This function is based off the env_vars_from_file function in docker-compose https://github.com/docker/compose/blob/master/compose/config/environment.py
+#>
+function LoadEnvFile
+{
+	param()
+	if(Test-Path ".env")
+	{
+		$line = ""
+		$reader = [System.IO.File]::OpenText(".env")
+		try {
+			while(($line = $reader.ReadLine()) -ne $null)
+			{
+
+			}	
+		}
+		finally{
+
+		}
+	}
+}
+
+<#
+Based on the get_project_name for the docker-compose git repo https://github.com/docker/compose/blob/master/compose/cli/command.py
+#>
+function GetProjectName
+{
+	$composeProjectName = $env:COMPOSE_PROJECT_NAME
+	if(-Not $composeProjectName)
+	{
+		$composeProjectName = (Get-Item ".\").Name
+	}
+	if(-Not $composeProjectName)
+	{
+		$composeProjectName = "default"
+	}
+	return ($composeProjectName.ToLower() -replace "[^-_a-z0-9]*","")
+}
