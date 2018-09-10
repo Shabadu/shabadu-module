@@ -6,7 +6,7 @@ function Repair-DockerComposeNetwork {
 	VerifyDockerCompose
 
 	$config = GetConfig
-	findAndInstallCerts $config	
+	scanConfigAndRepair $config	
 }
 
 function scanConfigAndRepair
@@ -15,8 +15,10 @@ function scanConfigAndRepair
 		$config
 	)
 
+	$projectName = GetProjectName
 
-	if($config -and $config.services)
+
+	if($config -and $config.services -and $config.networks)
 	{
 		foreach($skey in $config.services.keys)
 		{
@@ -24,7 +26,14 @@ function scanConfigAndRepair
 			$service = $config.services[$skey]
 			if($service.networks)
 			{
-				$containerId = docker container
+				foreach($nkey in $service.networks.keys)
+				{
+					$network = $service.networks[$nkey]
+					if($network -ne $null -and $network -is [System.Collections.DictionaryEntry] -and $network.ContainsKey("ipv4_address"))
+					{
+						Write-Host "Contains ipv4_address"
+					}
+				}
 			}
 			else 
 			{

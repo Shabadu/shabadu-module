@@ -1,0 +1,61 @@
+version: "2.4"
+
+services:
+  mongo:
+    image: mongo:3.2-windowsservercore
+    volumes:
+      - "./Docker/temp/mongo:c:/data/db"
+    networks: 
+      smnet:
+        ipv4_address: 192.168.20.5
+        aliases:
+          - "mongo"
+          - "mongo.${domain}"
+
+  solr:
+    image: "${ContainerStore}/solr.${domain}:82u7v3"
+    mem_limit: 2G
+    networks: 
+      smnet:
+        ipv4_address: 192.168.20.4
+        aliases:
+          - "solr"
+          - "solr.${domain}"
+
+  sql:
+    image: "${ContainerStore}/sql.express.${domain}:82u7v7"
+    mem_limit: 3G
+    networks: 
+      smnet:
+        ipv4_address: 192.168.20.3
+        aliases:
+          - "sql"
+          - "db"
+          - "sql.${domain}"
+
+  iis:
+    image: "${ContainerStore}/iis.${domain}:82u7v9"
+    mem_limit: 5G
+    volumes:
+      - "./Docker/temp/Data:c:/Data/Data"
+      - "./:C:/Work/SelectMedical"
+      - "./Docker/temp/zzzz:c:/config/"
+    depends_on:
+      - mongo
+      - solr
+      - sql
+    networks:
+      smnet:
+        ipv4_address: "192.168.20.2"
+      mnet:
+
+networks:
+  smnet:
+    driver: nat
+    ipam:
+      driver: windows
+      config:
+        - subnet: 192.168.20.0/24
+          gateway: 192.168.20.1
+  mnet:
+    driver: nat

@@ -62,20 +62,41 @@ This function is based off the env_vars_from_file function in docker-compose htt
 function LoadEnvFile
 {
 	param()
-	if(Test-Path ".env")
+
+	$result=@{}
+
+
+	if(Test-Path "$PWD\.env")
 	{
 		$line = ""
-		$reader = [System.IO.File]::OpenText(".env")
+		$reader = [System.IO.File]::OpenText("$PWD\.env")
 		try {
 			while(($line = $reader.ReadLine()) -ne $null)
 			{
+				$line = $line.Trim()
+				if(-Not $line.StartsWith("#"))
+				{
+					$index = $line.IndexOf("=")
+					if($index -ne -1)
+					{
+						$key = $line.Substring(0, $index)
+						$value = ""
+						if(($index + 1) -lt $line.Length)
+						{
+							$value = $line.Substring($index + 1, $line.Length - ($index + 1))
+						}
 
+						$result[$key] = $value
+					}
+				}
 			}	
 		}
 		finally{
-
+			$reader.Dispose()
 		}
 	}
+
+	return $result;
 }
 
 <#
@@ -83,7 +104,16 @@ Based on the get_project_name for the docker-compose git repo https://github.com
 #>
 function GetProjectName
 {
-	$composeProjectName = $env:COMPOSE_PROJECT_NAME
+	$envData = LoadEnvFile
+	$composeProjectName = $null
+	if($envData.ContainsKey("COMPOSE_PROJECT_NAME"))
+	{
+		$composeProjectName = $envData["COMPOSE_PROJECT_NAME"]
+	}
+	if(-Not $composeProjectName)
+	{
+		$composeProjectName =  $env:COMPOSE_PROJECT_NAME
+	}
 	if(-Not $composeProjectName)
 	{
 		$composeProjectName = (Get-Item ".\").Name
