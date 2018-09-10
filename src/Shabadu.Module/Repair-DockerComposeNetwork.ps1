@@ -29,8 +29,8 @@ function scanConfigAndRepair
 				foreach($nkey in $service.networks.keys)
 				{
 					$network = $service.networks[$nkey]
-					if($network -ne $null -and $network -is [System.Collections.DictionaryEntry] -and $network.ContainsKey("ipv4_address"))
-					{
+					if($network -ne $null -and $network.ContainsKey -and $network.ContainsKey("ipv4_address"))
+					{ 
 						Write-Host "Contains ipv4_address"
 					}
 				}
